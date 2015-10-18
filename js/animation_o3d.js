@@ -1,3 +1,79 @@
+/*
+ // fake stuff
+
+ function noop() {}
+
+ var o3djs = {
+ math: {
+ matrix4: {
+ translation: function(c) {
+ return null; // TODO return matrix4
+ }
+ }
+ },
+ rendergraph: {
+ createBasicView: function(pack, root, render) {
+ return {
+ clearBuffer: {
+ clearColor: null
+ }
+ };
+ }
+ },
+ material: {
+ createBasicMaterial: function(pack, viewInfo, color) {
+ return color;
+ },
+ createAndBindStandardParams: function(pack) {
+ return {
+ lightWorldPos: {
+ value: null
+ },
+ lightColor: {
+ value: null
+ }
+ };
+ }
+ },
+ primitives: {
+ createBox: function(pack, material, x, y, z, transform) {
+ return null; //TODO
+ },
+ createSphere: function(pack, material, r, f1, f2, transform) {
+ return null; //TODO
+ },
+ createCylinder: function(pack, material, r, h, f1, f2, transform) {
+ return null; // TODO
+ }
+ },
+ event: {
+ addEventListener: noop
+ }
+ };
+
+ initStep2([{
+ o3d: null,
+ client: {
+ createPack: function() {
+ return {
+ createObject: function(typ) {
+ switch(typ) {
+ case 'Transform':
+ return {
+ parent: null,
+ addShape: function(shape) {
+ return null; // TODO
+ }
+ };
+ }
+ }
+ }
+ },
+ renderGraphRoot: null
+ }
+ }]);
+
+ */
 
 o3djs.base.o3d = o3d;
 o3djs.require('o3djs.webgl');
@@ -7,6 +83,8 @@ o3djs.require('o3djs.math');
 o3djs.require('o3djs.rendergraph');
 o3djs.require('o3djs.primitives');
 o3djs.require('o3djs.material');
+
+
 
 // constants
 var MOVE_VELOCITY = 25;  // in units per second.
