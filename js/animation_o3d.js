@@ -1,80 +1,4 @@
 /*
- // fake stuff
-
- function noop() {}
-
- var o3djs = {
- math: {
- matrix4: {
- translation: function(c) {
- return null; // TODO return matrix4
- }
- }
- },
- rendergraph: {
- createBasicView: function(pack, root, render) {
- return {
- clearBuffer: {
- clearColor: null
- }
- };
- }
- },
- material: {
- createBasicMaterial: function(pack, viewInfo, color) {
- return color;
- },
- createAndBindStandardParams: function(pack) {
- return {
- lightWorldPos: {
- value: null
- },
- lightColor: {
- value: null
- }
- };
- }
- },
- primitives: {
- createBox: function(pack, material, x, y, z, transform) {
- return null; //TODO
- },
- createSphere: function(pack, material, r, f1, f2, transform) {
- return null; //TODO
- },
- createCylinder: function(pack, material, r, h, f1, f2, transform) {
- return null; // TODO
- }
- },
- event: {
- addEventListener: noop
- }
- };
-
- initStep2([{
- o3d: null,
- client: {
- createPack: function() {
- return {
- createObject: function(typ) {
- switch(typ) {
- case 'Transform':
- return {
- parent: null,
- addShape: function(shape) {
- return null; // TODO
- }
- };
- }
- }
- }
- },
- renderGraphRoot: null
- }
- }]);
-
- */
-
 o3djs.base.o3d = o3d;
 o3djs.require('o3djs.webgl');
 
@@ -83,8 +7,7 @@ o3djs.require('o3djs.math');
 o3djs.require('o3djs.rendergraph');
 o3djs.require('o3djs.primitives');
 o3djs.require('o3djs.material');
-
-
+*/
 
 // constants
 var MOVE_VELOCITY = 25;  // in units per second.
@@ -191,19 +114,19 @@ function initStep2(clientElements) {
         g_math.matrix4.translation([0, 4, 0]));
 
     var transformCOG = g_pack.createObject('Transform');
-    transformCOG.parent = g_root;
+    g_root.add(transformCOG); //transformCOG.parent = g_root;
 
     var bendCOG = g_pack.createObject('Transform');
-    bendCOG.parent = transformCOG;
-    bendCOG.addShape(bodyShape);
+    transformCOG.add(bendCOG); //bendCOG.parent = transformCOG;
+    bendCOG.add(bodyShape); // bendCOG.addShape(bodyShape);
 
     // Create a head for my character
     var head = o3djs.primitives.createSphere(
         g_pack, redMaterial, 2.5, 18, 18,
         g_math.matrix4.translation([0, 11, 0]));
     var transformHead = g_pack.createObject('Transform');
-    transformHead.parent = bendCOG;
-    transformHead.addShape(head);
+    bendCOG.add(transformHead); // transformHead.parent = bendCOG;
+    transformHead.add(head); // transformHead.addShape(head);
 
     // Create arms for my character - left
     var upper_arm_left = o3djs.primitives.createCylinder(
@@ -213,16 +136,16 @@ function initStep2(clientElements) {
         g_pack, redMaterial, 1.05, 18, 18,
         g_math.matrix4.translation([4, 2.0, 0]));
     var transformArmLeft = g_pack.createObject('Transform');
-    transformArmLeft.parent = bendCOG;
-    transformArmLeft.addShape(upper_arm_left);
-    transformArmLeft.addShape(joint_arm_left);
+    bendCOG.add(transformArmLeft); // transformArmLeft.parent = bendCOG;
+    transformArmLeft.add(upper_arm_left); // transformArmLeft.addShape(upper_arm_left);
+    transformArmLeft.add(joint_arm_left); // transformArmLeft.addShape(joint_arm_left);
 
     var lower_arm_left = o3djs.primitives.createCylinder(
         g_pack, redMaterial, 1, 4.25, 18, 10,
         g_math.matrix4.translation([4, -0.125, 0]));
     var transformLowerArmLeft = g_pack.createObject('Transform');
-    transformLowerArmLeft.parent = transformArmLeft;
-    transformLowerArmLeft.addShape(lower_arm_left);
+    transformArmLeft.add(transformLowerArmLeft); // transformLowerArmLeft.parent = transformArmLeft;
+    transformLowerArmLeft.add(lower_arm_left); // transformLowerArmLeft.addShape(lower_arm_left);
 
     // Create arms for my character - right
     var upper_arm_right = o3djs.primitives.createCylinder(
@@ -232,16 +155,16 @@ function initStep2(clientElements) {
         g_pack, redMaterial, 1.05, 18, 18,
         g_math.matrix4.translation([-4, 2.0, 0]));
     var transformArmRight = g_pack.createObject('Transform');
-    transformArmRight.parent = bendCOG;
-    transformArmRight.addShape(upper_arm_right);
-    transformArmRight.addShape(joint_arm_right);
+    bendCOG.add(transformArmRight); // transformArmRight.parent = bendCOG;
+    transformArmRight.add(upper_arm_right); // transformArmRight.addShape(upper_arm_right);
+    transformArmRight.add(joint_arm_right); // transformArmRight.addShape(joint_arm_right);
 
     var lower_arm_right = o3djs.primitives.createCylinder(
         g_pack, redMaterial, 1, 4.25, 18, 10,
         g_math.matrix4.translation([-4, -0.125, 0]));
     var transformLowerArmRight = g_pack.createObject('Transform');
-    transformLowerArmRight.parent = transformArmRight;
-    transformLowerArmRight.addShape(lower_arm_right);
+    transformArmRight.add(transformLowerArmRight); // transformLowerArmRight.parent = transformArmRight;
+    transformLowerArmRight.add(lower_arm_right); // transformLowerArmRight.addShape(lower_arm_right);
 
     // Create legs for my character -left
     var upper_leg_left = o3djs.primitives.createCylinder(
@@ -251,23 +174,23 @@ function initStep2(clientElements) {
         g_pack, redMaterial, 1.55, 18, 18,
         g_math.matrix4.translation([1.8, -6.75, 0]));
     var transformLegLeft = g_pack.createObject('Transform');
-    transformLegLeft.parent = transformCOG;
-    transformLegLeft.addShape(upper_leg_left);
-    transformLegLeft.addShape(knee_left);
+    transformCOG.add(transformLegLeft); // transformLegLeft.parent = transformCOG;
+    transformLegLeft.add(upper_leg_left); // transformLegLeft.addShape(upper_leg_left);
+    transformLegLeft.add(knee_left); // transformLegLeft.addShape(knee_left);
 
     var lower_leg_left = o3djs.primitives.createCylinder(
         g_pack, redMaterial, 1.5, 6, 18, 10,
         g_math.matrix4.translation([1.8, -9.75, 0]));
     var transformLowerLegLeft = g_pack.createObject('Transform');
-    transformLowerLegLeft.parent = transformLegLeft;
-    transformLowerLegLeft.addShape(lower_leg_left);
+    transformLegLeft.add(transformLowerLegLeft); // transformLowerLegLeft.parent = transformLegLeft;
+    transformLowerLegLeft.add(lower_leg_left); // transformLowerLegLeft.addShape(lower_leg_left);
 
     var foot_left = o3djs.primitives.createBox(
         g_pack, redMaterial, 2.4, 1.2, 4.3,
         g_math.matrix4.translation([1.8, -13, 0.8]));
     var transformFootLeft = g_pack.createObject('Transform');
-    transformFootLeft.parent = transformLowerLegLeft;
-    transformFootLeft.addShape(foot_left);
+    transformLowerLegLeft.add(transformFootLeft); // transformFootLeft.parent = transformLowerLegLeft;
+    transformFootLeft.add(foot_left); // transformFootLeft.addShape(foot_left);
 
     // Create legs for my character - right
     var upper_leg_right = o3djs.primitives.createCylinder(
@@ -277,23 +200,23 @@ function initStep2(clientElements) {
         g_pack, redMaterial, 1.55, 18, 18,
         g_math.matrix4.translation([-1.8, -6.75, 0]));
     var transformLegRight = g_pack.createObject('Transform');
-    transformLegRight.parent = transformCOG;
-    transformLegRight.addShape(upper_leg_right);
-    transformLegRight.addShape(knee_right);
+    transformLegRight.parent = transformCOG; // transformLegRight.parent = transformCOG;
+    transformLegRight.add(upper_leg_right); // transformLegRight.addShape(upper_leg_right);
+    transformLegRight.add(knee_right); // transformLegRight.addShape(knee_right);
 
     var lower_leg_right = o3djs.primitives.createCylinder(
         g_pack, redMaterial, 1.5, 6, 18, 10,
         g_math.matrix4.translation([-1.8, -9.75, 0]));
     var transformLowerLegRight = g_pack.createObject('Transform');
-    transformLowerLegRight.parent = transformLegRight;
-    transformLowerLegRight.addShape(lower_leg_right);
+    transformLegRight.add(transformLowerLegRight); // transformLowerLegRight.parent = transformLegRight;
+    transformLowerLegRight.add(lower_leg_right); // transformLowerLegRight.addShape(lower_leg_right);
 
     var foot_right = o3djs.primitives.createBox(
         g_pack, redMaterial, 2.4, 1.2, 4.3,
         g_math.matrix4.translation([-1.8, -13, 0.8]));
     var transformFootRight = g_pack.createObject('Transform');
-    transformFootRight.parent = transformLowerLegRight;
-    transformFootRight.addShape(foot_right);
+    transformLowerLegRight.add(transformFootRight); // transformFootRight.parent = transformLowerLegRight;
+    transformFootRight.add(foot_right); // transformFootRight.addShape(foot_right);
 
     g_playerTransform[0] = transformCOG;
     g_playerTransform[1] = bendCOG;
