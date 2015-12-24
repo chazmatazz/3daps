@@ -33,7 +33,7 @@ function r() {
         .pipe(gulp.dest('dist'));
 }
 
-gulp.task('default', ['build-dev']);
+gulp.task('default', ['build-all']);
 
 gulp.task('compress', function() {
     r()
@@ -49,12 +49,14 @@ gulp.task('jshint', function() {
         //.pipe(jshint.reporter('fail'));
 });
 
-gulp.task('build-dev', ['jshint'], function() {
+gulp.task('build-all', ['jshint, build-dev']);
+
+gulp.task('build-dev', function() {
     r();
 });
 
-gulp.task('watch',function() {
-    gulp.watch([ './css/**', './js/**', './index.html'], ['build-dev']);
+gulp.task('watch',['build-all'], function() {
+    gulp.watch([ './css/**/*.js', './js/**/*.js', './index.html'], ['build-all']);
 });
 
 gulp.task('test-watch', function() {
