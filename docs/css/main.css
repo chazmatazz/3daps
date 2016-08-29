@@ -1,0 +1,29 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: Arial, sans-serif;
+}
+
+#o3d {
+    float: right;
+    height: 100%;
+    width: 50%;
+}
+
+#code {
+    height: 90%;
+}
+
+#textbox {
+    height: 100%;
+    width: 49%;
+    font-family: "courier new", courier, monospace;
+    font-size:105%;
+}
+
+#dialog-message {
+    display: none;
+    font-size: 70%;
+}

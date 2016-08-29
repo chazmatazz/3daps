@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Own Your Avatar!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/main.css" type="text/css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css" type="text/css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r72/three.js"></script>
+    <script src="dist/main.js"></script>
+    <script>
+        var g_keyDown = [];  // which keys are down by key code.
+
+        var base_url = window.location.href.substring(0, window.location.href.length - window.location.search.length);
+
+        var local_urls = {
+            kate: "examples/kate.js",
+            yoga: "examples/yoga.js"
+        };
+
+        var default_code = local_urls.kate;
+
+        var first_run = true;
+        function populate_dropdown(target, data) {
+            for(var i = 0; i < data.length; i++) {
+                $('<option />', {value: data[i], text: i, selected: (data[i] == default_code)}).appendTo(target);
+            }
+        }
+        function load_code(url) {
+            $.get(url, function(data) {
+                $("textarea#textbox").val(data);
+                if(first_run && qs["autorun"]) {
+                    run_user_script();
+                    first_run = false;
+                }
+            }, "html");
+        }
+
+        function autorun(example) {
+            $("#share-url").html(base_url + "?autorun=1&example=" + example);
+            $( "#dialog-message" ).dialog({
+                modal: true,
+                buttons: {
+                    Ok: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+
+        }
+
+        var qs = (function(a) {
+            if (a == "") return {};
+            var b = {};
+            for (var i = 0; i < a.length; ++i)
+            {
+                var p=a[i].split('=');
+                if (p.length != 2) continue;
+                b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+            return b;
+        })(window.location.search.substr(1).split('&'));
+
+        function load_example() {
+            load_code($("#example_list").val());
+        }
+
+        function share_example() {
+            autorun($("#example_list option:selected").text());
+        }
+
+        window.onload = init;
+        var m;
+        /**
+         * Creates the client area.
+         */
+        function init() {
+            populate_dropdown($("#example_list"), local_urls);
+            if(local_urls.hasOwnProperty(qs["example"])) {
+                load_code(local_urls[qs["example"]]);
+            } else {
+                load_code(default_code);
+            }
+
+            m = main();
+            m.init();
+        }
+
+        /**
+         * Tracks key down events.
+         * @param {Event} e keyboard event.
+         */
+        function onKeyDown(e) {
+            g_keyDown[e.keyCode] = true;
+        }
+
+        /**
+         * Tracks key up events.
+         * @param {Event} e keyboard event.
+         */
+        function onKeyUp(e) {
+            g_keyDown[e.keyCode] = false;
+        }
+
+        /**
+         * Look at keys.
+         */
+        function handleMoveKeys(elapsedTime) {
+        }
+
+        /* Added by Ken, captures 'tab' inputs as indents instead of navigating to
+         the next form */
+        function setSelectionRange(input, selectionStart, selectionEnd) {
+            if (input.setSelectionRange) {
+                input.focus();
+                input.setSelectionRange(selectionStart, selectionEnd);
+            }
+            else if (input.createTextRange) {
+                var range = input.createTextRange();
+                range.collapse(true);
+                range.moveEnd('character', selectionEnd);
+                range.moveStart('character', selectionStart);
+                range.select();
+            }
+        }
+
+        function replaceSelection(input, replaceString) {
+            if (input.setSelectionRange) {
+                var selectionStart = input.selectionStart;
+                var selectionEnd = input.selectionEnd;
+
+                var scrollTop = input.scrollTop; // fix scrolling issue with Firefox
+                input.value = input.value.substring(0, selectionStart) + replaceString +
+                        input.value.substring(selectionEnd);
+                input.scrollTop = scrollTop;
+
+
+                if (selectionStart != selectionEnd){
+                    setSelectionRange(input, selectionStart, selectionStart + 	replaceString.length);
+                }else{
+                    setSelectionRange(input, selectionStart + replaceString.length, selectionStart + replaceString.length);
+                }
+
+            } else if (document.selection) {
+                var range = document.selection.createRange();
+
+                if (range.parentElement() == input) {
+                    var isCollapsed = range.text === '';
+                    range.text = replaceString;
+
+                    if (!isCollapsed)  {
+                        range.moveStart('character', -replaceString.length);
+                        range.select();
+                    }
+                }
+            }
+        }
+
+        function catchTab(item,e){
+            if(navigator.userAgent.match("Gecko")){
+                c=e.which;
+            }else{
+                c=e.keyCode;
+            }
+            if(c==9){
+                replaceSelection(item,"   ");
+                setTimeout("document.getElementById('"+item.id+"').focus();",0);
+                return false;
+            }
+        }
+
+        function run_user_script() {
+            try {
+                _3daps.run_user_script(document.code_form.code_box.value);
+            } catch(e) {
+                document.code_form.code_box.value += "\nError";
+            }
+        }
+
+        function stop_user_script() {
+            _3daps.stop_user_script();
+        }
+
+        function reset_me() {
+            _3daps.reset_me();
+        }
+    </script>
+</head>
+<body>
+  <div id="webgl"></div>
+  <div id="code">
+    <form name="code_form">
+    	<select id="example_list" name="example_list"></select>
+    	<button onClick="load_example(); return false;">Load Example</button>
+    	<button onClick="share_example(); return false;">Share Example</button>
+    <textarea id="textbox" name="code_box" onkeydown="return catchTab(this,event)">
+</textarea></form>
+  <button onClick="run_user_script(); return false;">Run</button>
+  <button onClick="stop_user_script(); return false;">Stop</button>
+  <button onClick="reset_me(); return false;">Reset Me</button>
+  </div>
+  <div id="dialog-message" title="Share">
+	<p>Share the following url:</p>
+	<p id="share-url"></p>
+</div>
+</body>
+</html>

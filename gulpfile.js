@@ -49,10 +49,19 @@ gulp.task('jshint', function() {
         //.pipe(jshint.reporter('fail'));
 });
 
-gulp.task('build-all', ['jshint, build-dev']);
+gulp.task('build-all', ['jshint', 'build-dev']);
 
 gulp.task('build-dev', function() {
     r();
+    gulp.src('./index.html')
+      .pipe(concat('index.html'))
+      .pipe(gulp.dest('docs'));
+    gulp.src('./dist/main.js')
+      .pipe(concat('main.js'))
+      .pipe(gulp.dest('docs/dist'));
+    gulp.src('./css/main.css')
+      .pipe(concat('main.css'))
+      .pipe(gulp.dest('docs/css'));
 });
 
 gulp.task('watch',['build-all'], function() {
